@@ -11,14 +11,16 @@ if ! command -v curl >/dev/null 2>&1; then
 fi
 
 endpoints=(
-  "/clasica/rar"
-  "/clasica/zip"
-  "/duck-typing/7z"
-  "/funcional/rar"
-  "/funcional/zip"
-  "/diccionario/rar"
-  "/diccionario/zip"
-  "/diccionario/7z"
+  "/comprimir/gof/rar"
+  "/comprimir/gof/zip"
+  "/comprimir/duck-typing/7z"
+  "/comprimir/duck-typing/rar"
+  "/comprimir/duck-typing/zip"
+  "/comprimir/funcional/rar"
+  "/comprimir/funcional/zip"
+  "/comprimir/diccionario/rar"
+  "/comprimir/diccionario/zip"
+  "/comprimir/diccionario/7z"
 )
 
 for endpoint in "${endpoints[@]}"; do

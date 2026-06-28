@@ -1,6 +1,6 @@
 import { IEstrategiaCompresion } from './interfaces/IEstrategiaCompresion.js';
 
-export class GestorArchivosClasico {
+export class CompresorArchivoContext {
     private estrategia: IEstrategiaCompresion;
 
     constructor(estrategia: IEstrategiaCompresion) {
@@ -11,7 +11,7 @@ export class GestorArchivosClasico {
         this.estrategia = estrategia;
     }
 
-    ejecutarCompresion(archivo: string): string {
+    comprimir(archivo: string): string {
         return this.estrategia.comprimir(archivo);
     }
 }

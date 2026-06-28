@@ -1,73 +1,69 @@
 import { Request, Response } from 'express';
-import { IEstrategiaCompresion } from '../strategies/classic/interfaces/IEstrategiaCompresion.js';
-import { GestorArchivosClasico } from '../strategies/classic/GestorClasico.js';
-import { Compresor, GestorEstructural } from '../strategies/duck-typing/Estructural.js';
-import { FuncionCompresion, procesarArchivo } from '../strategies/functional/Funcional.js';
-import { comprimirConDiccionario, TipoCompresion } from '../strategies/registry/Diccionario.js';
+import { TipoCompresion } from '../strategies/classic/CompresionStrategyFactory.js';
+import { TipoCompresionEstructural } from '../strategies/duck-typing/Estructural.js';
+import { TipoCompresion as TipoCompresionDiccionario } from '../strategies/registry/Diccionario.js';
+import { CompresionService } from '../services/compresion/CompresionService.js';
+import { CompresionDiccionarioService } from '../services/compresion/CompresionDiccionarioService.js';
+import { CompresionEstructuralService } from '../services/compresion/CompresionEstructuralService.js';
+import { CompresionFuncionalService } from '../services/compresion/CompresionFuncionalService.js';
 
 export class CompresionController {
-    // private obtenerNombreEstrategia = (estrategia: unknown): string => {
-    //     const estrategiaTipada = estrategia as { name?: string; constructor?: { name?: string; }; };
+    // GOF
+    private readonly compresionService = new CompresionService();
+    // comprime con la estrategia de gof
+    public comprimir = (req: Request, res: Response): void => {
+        const { archivo } = req.body;
+        const { tipo } = req.params as { tipo: TipoCompresion; };
 
-    //     return estrategiaTipada.name ?? estrategiaTipada.constructor?.name ?? 'EstrategiaDesconocida';
-    // };
+        const resultado = this.compresionService.comprimir(tipo, archivo);
 
-    public usarEstrategiaClasica = (estrategia: IEstrategiaCompresion) => {
-        return (req: Request, res: Response) => {
-            const { archivo } = req.body;
-
-            const gestor = new GestorArchivosClasico(estrategia);
-            const resultado = gestor.ejecutarCompresion(archivo);
-
-            res.json({
-                paradigma: 'GOF Strategy (tipo java)',
-                // estrategia: this.obtenerNombreEstrategia(estrategia),
-                resultado,
-            });
-        };
+        res.json({
+            paradigma: 'GOF Strategy (tipo java)',
+            estrategia: tipo,
+            resultado,
+        });
     };
 
-    public usarEstrategiaEstructural = (compresor: Compresor) => {
-        return (req: Request, res: Response) => {
-            const { archivo } = req.body;
 
-            const gestor = new GestorEstructural(compresor);
-            const resultado = gestor.procesar(archivo);
+    // OTRAS FORMAS
+    private readonly estructuralService = new CompresionEstructuralService();
+    private readonly funcionalService = new CompresionFuncionalService();
+    private readonly diccionarioService = new CompresionDiccionarioService();
 
-            res.json({
-                paradigma: 'Duck Typing',
-                // estrategia: this.obtenerNombreEstrategia(compresor),
-                resultado,
-            });
-        };
+    public comprimirConEstrategiaEstructural = (req: Request, res: Response): void => {
+        const { archivo } = req.body;
+        const { tipo } = req.params as { tipo: TipoCompresionEstructural; };
+
+        const resultado = this.estructuralService.ejecutar(tipo, archivo);
+
+        res.json({
+            paradigma: 'Duck Typing',
+            estrategia: tipo,
+            resultado,
+        });
     };
 
-    public usarEstrategiaFuncional = (algoritmo: FuncionCompresion) => {
-        return (req: Request, res: Response) => {
-            const { archivo } = req.body;
-            const resultado = procesarArchivo(archivo, algoritmo);
+    public comprimirConEstrategiaFuncional = (req: Request, res: Response): void => {
+        const { archivo } = req.body;
+        const { algoritmo } = req.params as { algoritmo: 'rar' | 'zip'; };
+        const resultado = this.funcionalService.ejecutar(algoritmo, archivo);
 
-            res.json({
-                paradigma: 'Functional Strategy',
-                // estrategia: this.obtenerNombreEstrategia(algoritmo),
-                resultado,
-            });
-        };
+        res.json({
+            paradigma: 'Functional Strategy',
+            resultado,
+        });
     };
 
-    public usarEstrategiaDiccionario = () => {
-        return (req: Request, res: Response) => {
-            const { archivo } = req.body;
-            const { tipo } = req.params as { tipo: TipoCompresion; };
+    public comprimirConEstrategiaDiccionario = (req: Request, res: Response): void => {
+        const { archivo } = req.body;
+        const { tipo } = req.params as { tipo: TipoCompresionDiccionario; };
 
-            const resultado = comprimirConDiccionario(tipo, archivo);
+        const resultado = this.diccionarioService.ejecutar(tipo, archivo);
 
-            res.json({
-                paradigma: 'Registry / Dictionary',
-                // estrategia: tipo,
-                resultado,
-            });
-        };
+        res.json({
+            paradigma: 'Registry / Dictionary',
+            resultado,
+        });
     };
 
 }
