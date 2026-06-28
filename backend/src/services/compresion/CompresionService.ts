@@ -3,8 +3,8 @@ import { CompresorArchivoContext } from '../../strategies/classic/CompresorArchi
 export class CompresionService {
     comprimir(tipo: TipoCompresion, archivo: string): string {
         const estrategia = CompresionStrategySimpleFactory.crear(tipo);
-        const gestor = new CompresorArchivoContext(estrategia);
+        const compresor = new CompresorArchivoContext(estrategia);
 
-        return gestor.comprimir(archivo);
+        return compresor.comprimir(archivo);
     }
 }
